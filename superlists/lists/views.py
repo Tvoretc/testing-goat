@@ -1,6 +1,7 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
 # Create your views here.
 
 def indexView(request):
-    return None
+    return HttpResponse('<html><head><title>To-Do lists</title></head><body></body></html>')

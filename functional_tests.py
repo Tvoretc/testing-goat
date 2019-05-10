@@ -14,7 +14,7 @@ class NewVisitorTest(unittest.TestCase):
         #, "Title was " + browser.title
 
     def tearDown(self):
-        browser.quit()
+        self.browser.quit()
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
