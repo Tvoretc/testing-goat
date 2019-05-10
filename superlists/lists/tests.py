@@ -1,8 +1,11 @@
+from django.urls import resolve
 from django.test import TestCase
+from lists.views import indexView
 
 # Create your tests here.
 
-class SmokeTest(TestCase):
+class IndexPageTest(TestCase):
 
-    def test_bad_math(self):
-        self.assertEqual(1 + 1, 3)
+    def test_index_url_to_index_page_view(self):
+        found = resolve('/')
+        self.assertEqual(found.func, indexView)
