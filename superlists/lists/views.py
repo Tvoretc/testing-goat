@@ -4,4 +4,4 @@ from django.http import HttpResponse
 # Create your views here.
 
 def indexView(request):
-    return render(request, 'lists/index.html')
+    return render(request, 'lists/index.html', {'new_item_text' : request.POST.get('item_text', '')})

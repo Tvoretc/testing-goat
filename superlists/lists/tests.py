@@ -15,3 +15,8 @@ class IndexPageTest(TestCase):
     def test_index_view_returns_correct_html(self):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'lists/index.html')
+
+    def test_post(self):
+        response = self.client.post('/', data={'item_text' : 'New item'})
+        self.assertIn('New item', response.content.decode())
+        self.assertTemplateUsed(response, 'lists/index.html')
