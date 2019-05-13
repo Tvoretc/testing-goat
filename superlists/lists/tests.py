@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.http import HttpRequest
 
 from lists.views import indexView
-
+from lists.models import Item
 # Create your tests here.
 
 class IndexPageTest(TestCase):
@@ -20,3 +20,18 @@ class IndexPageTest(TestCase):
         response = self.client.post('/', data={'item_text' : 'New item'})
         self.assertIn('New item', response.content.decode())
         self.assertTemplateUsed(response, 'lists/index.html')
+
+
+class ItemModelTest(TestCase):
+    def test_saying_and_retriving_items(self):
+        to_dos = ("The first list item", "Item the second")
+        for to_do in to_dos:
+            item = Item()
+            item.text = to_do
+            item.save()
+
+        saved_items = Item.objects.all()
+        self.assertEqual(saved_items.count(), len(to_dos))
+
+        for i in range(len(saved_items)):
+            self.assertIn(saved_items[i].text, to_dos)
