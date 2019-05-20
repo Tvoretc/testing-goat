@@ -1,16 +1,16 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import unittest
+from django.test import LiveServerTestCase
 import time
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Chrome('C:\\webdrivers\\chromedriver.exe')
 
-    def test(self):
+    def test_visit(self):
         #visit site
-        self.browser.get('http://localhost:8000/')
+        self.browser.get(self.live_server_url)
 
         #see the title and header
         self.assertIn('To-Do', self.browser.title)
@@ -38,9 +38,8 @@ class NewVisitorTest(unittest.TestCase):
             table = self.browser.find_element_by_tag_name('table')
             rows = table.find_elements_by_tag_name('tr')
             for item in to_do_items[:i+1]:
-                self.assertIn(
-                    item,
-                    (row.text for row in rows),
+                self.assertTrue(
+                    any(item in row.text for row in rows),
                     f"Item <{item}> did not appeare in a table: \n{table.text}"
                 )
 
@@ -56,5 +55,6 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+#
+# if __name__ == '__main__':
+#     unittest.main(warnings='ignore')
