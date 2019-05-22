@@ -20,4 +20,5 @@ from lists import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.indexView, name = 'index'),
+    path('lists/the-only-list/', views.listView, name = 'view_list'),
 ]

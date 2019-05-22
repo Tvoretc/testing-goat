@@ -5,11 +5,15 @@ from lists.models import Item
 # Create your views here.
 
 def indexView(request):
-    print('entered index view. Method = ' + request.method)
     if request.method == 'POST':
         Item.objects.create(text = request.POST['item_text'])
-        return redirect('/')
+        return redirect('/lists/the-only-list/')
 
     return render(request, 'lists/index.html', {
         'items' : Item.objects.all()
     })
+
+def listView(request):
+        return render(request, 'lists/list.html', {
+            'items' : Item.objects.all()
+        })

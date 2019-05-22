@@ -12,6 +12,10 @@ class IndexPageTest(TestCase):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'lists/index.html')
 
+    def test_uses_list_template(self):
+        response = self.client.get('/lists/the-only-list/')
+        self.assertTemplateUsed(response, 'lists/list.html')
+
     def test_post_can_save(self):
         test_item_text = 'New item'
         response = self.client.post('/', data={'item_text' : test_item_text})
@@ -24,25 +28,28 @@ class IndexPageTest(TestCase):
         response = self.client.post('/', data={'item_text' : 'test'})
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/the-only-list/')
 
     def test_save_items_when_nessesary(self):
         count = Item.objects.count()
         self.client.get('/')
         self.assertEqual(Item.objects.count(), count)
 
+
+class ListViewTest(TestCase):
     def test_displays_all_list(self):
         Item.objects.create(text = 'item 1')
         Item.objects.create(text = 'item 2')
 
-        response = self.client.get('/')
+        response = self.client.get('/lists/the-only-list/')
 
-        self.assertIn('item 1', response.content.decode())
-        self.assertIn('item 2', response.content.decode())
+        self.assertContains(response, 'item 1')
+        self.assertContains(response, 'item 2')
+
 
 
 class ItemModelTest(TestCase):
-    def test_saying_and_retriving_items(self):
+    def test_saving_and_retriving_items(self):
         to_dos = ("The first list item", "Item the second")
         for to_do in to_dos:
             item = Item()
