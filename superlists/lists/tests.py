@@ -16,20 +16,6 @@ class IndexPageTest(TestCase):
         response = self.client.get('/lists/the-only-list/')
         self.assertTemplateUsed(response, 'lists/list.html')
 
-    def test_post_can_save(self):
-        test_item_text = 'New item'
-        response = self.client.post('/', data={'item_text' : test_item_text})
-        first_item = Item.objects.first()
-
-        self.assertEqual(Item.objects.count(), 1)
-        self.assertEqual(first_item.text, test_item_text)
-
-    def test_redirect_after_post(self):
-        response = self.client.post('/', data={'item_text' : 'test'})
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/lists/the-only-list/')
-
     def test_save_items_when_nessesary(self):
         count = Item.objects.count()
         self.client.get('/')
@@ -46,6 +32,20 @@ class ListViewTest(TestCase):
         self.assertContains(response, 'item 1')
         self.assertContains(response, 'item 2')
 
+
+class NewListTest(self):
+    def test_post_can_save(self):
+        test_item_text = 'New item'
+        response = self.client.post('/lists/new', data={'item_text' : test_item_text})
+        first_item = Item.objects.first()
+
+        self.assertEqual(Item.objects.count(), 1)
+        self.assertEqual(first_item.text, test_item_text)
+
+    def test_redirect_after_post(self):
+        response = self.client.post('/lists/new', data={'item_text' : 'test'})
+
+        self.assertrRedirects(response, '/lists/the-only-list/')
 
 
 class ItemModelTest(TestCase):
