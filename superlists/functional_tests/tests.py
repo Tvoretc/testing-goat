@@ -32,8 +32,7 @@ class NewVisitorTest(LiveServerTestCase):
             #input the item
             inputbox.send_keys(to_do_items[i])
             inputbox.send_keys(Keys.ENTER)
-            # time.sleep(1)
-
+            
             #check the table for items
             table = self.browser.find_element_by_tag_name('table')
             rows = table.find_elements_by_tag_name('tr')
