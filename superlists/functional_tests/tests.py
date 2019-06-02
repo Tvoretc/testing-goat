@@ -32,7 +32,7 @@ class NewVisitorTest(LiveServerTestCase):
             #input the item
             inputbox.send_keys(to_do_items[i])
             inputbox.send_keys(Keys.ENTER)
-            
+
             #check the table for items
             table = self.browser.find_element_by_tag_name('table')
             rows = table.find_elements_by_tag_name('tr')
@@ -77,6 +77,27 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertNotEqual(first_url, second_url)
 
         self.assertNotIn('my unique to-do item.', table.text)
+
+    def test_styling_and_layout(self):
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024,768)
+
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta = 10
+        )
+
+        inputbox.send_keys('test')
+        inputbox.send_keys(Keys.ENTER)
+        
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta = 10
+        )
 
     def tearDown(self):
         self.browser.quit()
