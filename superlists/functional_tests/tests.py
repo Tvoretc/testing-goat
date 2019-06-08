@@ -53,7 +53,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox.send_keys(Keys.ENTER)
         table = self.browser.find_element_by_tag_name('table')
 
-        self.assertIn('1: my unique to-do item.', table.text)
+        self.assertIn('my unique to-do item.', table.text)
         first_url = self.browser.current_url
         self.assertRegex(first_url, '/lists/.+')
 
@@ -70,7 +70,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox.send_keys(Keys.ENTER)
         table = self.browser.find_element_by_tag_name('table')
 
-        self.assertIn('1: other user`s item.', table.text)
+        self.assertIn('other user`s item.', table.text)
 
         second_url = self.browser.current_url
         self.assertRegex(second_url, '/lists/.+')

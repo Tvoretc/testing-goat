@@ -4,24 +4,25 @@
     <meta charset="utf-8">
     <title>To-Do lists</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/master.css">
   </head>
   <body>
     <div class="container">
 
       <div class="row">
-        <div class="col-md-6 offset-md-3">
+        <div class="col-md-6 offset-md-3 jumbotron">
           <div class="text-center">
             <h1>{% block header %}{% endblock %}</h1>
-            <form method="post" action="{% block form_action %}{% endblock %}">
+            <form method="post"action="{% block form_action %}{% endblock %}">
               {% csrf_token %}
-              <input name="item_text" id="id_new_item" type="text" placeholder="Enter a to-do item">
+              <input name="item_text" class="form-control"  id="id_new_item" type="text" placeholder="Enter a to-do item">
             </form>
           </div>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-md-6 offset-md-3">
+        <div class="mx-auto">
           {% block table %}{% endblock %}
         </div>
       </div>
