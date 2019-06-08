@@ -3,14 +3,29 @@
   <head>
     <meta charset="utf-8">
     <title>To-Do lists</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
   </head>
   <body>
-    <h1>{% block header %}{% endblock %}</h1>
-    <form method="post" action="{% block form_action %}{% endblock %}">
-      {% csrf_token %}
-      <input name="item_text" id="id_new_item" type="text" placeholder="Enter a to-do item">
-    </form>
-    {% block table %}{% endblock %}
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-6 offset-md-3">
+          <div class="text-center">
+            <h1>{% block header %}{% endblock %}</h1>
+            <form method="post" action="{% block form_action %}{% endblock %}">
+              {% csrf_token %}
+              <input name="item_text" id="id_new_item" type="text" placeholder="Enter a to-do item">
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 offset-md-3">
+          {% block table %}{% endblock %}
+        </div>
+      </div>
+
+    </div>
   </body>
 </html>
