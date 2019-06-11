@@ -1,14 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-import time
+from functional_tests.base import FunctionalTest
 
-class NewVisitorTest(StaticLiveServerTestCase):
-
-    def setUp(self):
-        self.browser = webdriver.Chrome('C:\\webdrivers\\chromedriver.exe')
-
-    def test_new_visitor(self):
+class NewVisitorTest(FunctionalTest):
+    def test_new_visitor_creating_list(self):
         #visit site
         self.browser.get(self.live_server_url)
 
@@ -77,31 +72,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertNotEqual(first_url, second_url)
 
         self.assertNotIn('my unique to-do item.', table.text)
-
-    def test_styling_and_layout(self):
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024,768)
-
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta = 10
-        )
-
-        inputbox.send_keys('test')
-        inputbox.send_keys(Keys.ENTER)
-
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta = 10
-        )
-
-    def tearDown(self):
-        self.browser.quit()
-
-#
-# if __name__ == '__main__':
-#     unittest.main(warnings='ignore')
