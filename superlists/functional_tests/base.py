@@ -3,6 +3,9 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 import os
 
 class FunctionalTest(StaticLiveServerTestCase):
+    # def send_input(self, input, text):
+    #     input.send_keys(text)
+    #     input.send_keys(Keys.ENTER)
 
     def setUp(self):
         self.browser = webdriver.Chrome('C:\\webdrivers\\chromedriver.exe')
