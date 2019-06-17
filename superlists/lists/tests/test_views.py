@@ -67,7 +67,14 @@ class ListViewTest(TestCase):
             {'item_text' : 'right test text'}
         )
 
-        self.assertRedirects(response, f'/lists/{right_list.id}/')
+        self.assertTemplateUsed(response, 'lists/list.html')
+
+    def test_error_when_adding_empty_item_to_list(self):
+        list_ = List.objects.create()
+        response = self.client.post(f'/lists/{list_.id}/', data = {'item_text' : ''})
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'lists/list.html')
+        self.assertContains(response, 'Can`t have an empty list item,')
 
 
 class NewListTest(TestCase):

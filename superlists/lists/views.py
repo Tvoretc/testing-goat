@@ -10,10 +10,10 @@ def listView(request, list_id):
     if request.method == 'POST':
         text = request.POST['item_text']
         if len(text) == 0:
-            return render(request, 'lists/index.html', {'error' : 'Can`t have an empty list item,'})
+            return render(request, 'lists/list.html', {'error' : 'Can`t have an empty list item,'})
         list_ = List.objects.get(id = list_id)
         Item.objects.create(text = text, list = list_)
-        return redirect(f'/lists/{list_id}/')
+        # return redirect(f'/lists/{list_id}/')
 
     return render(request, 'lists/list.html', {
         'list' : List.objects.get(id = list_id)
