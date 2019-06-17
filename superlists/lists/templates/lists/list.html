@@ -1,7 +1,7 @@
 {% extends 'lists/base.html' %}
 
 {% block header %}To-Do items{% endblock %}
-{% block form_action %}/lists/{{list_id}}/{% endblock %}
+{% block form_action %}{% url 'list_view' list.id %}{% endblock %}
 {% block table %}
   <table id="id_list_table" class="table">
     <tbody>
