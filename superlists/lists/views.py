@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from lists.models import Item, List
+from lists.forms import ItemForm
 # Create your views here.
 
 def indexView(request):
-    return render(request, 'lists/index.html')
+    return render(request, 'lists/index.html', {'form': ItemForm()})
 
 def listView(request, list_id):
     if request.method == 'POST':

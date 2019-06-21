@@ -12,6 +12,10 @@ class IndexPageTest(TestCase):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'lists/index.html')
 
+    def test_use_right_form(self):
+        response = self.client.get('/')
+        self.assertIsInstanse(response.context['form'], ItemForm)
+
 
 class ListViewTest(TestCase):
     def test_uses_list_template(self):
