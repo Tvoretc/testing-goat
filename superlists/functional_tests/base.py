@@ -7,6 +7,9 @@ class FunctionalTest(StaticLiveServerTestCase):
     #     input.send_keys(text)
     #     input.send_keys(Keys.ENTER)
 
+    def get_item_input_box(self):
+        return self.browser.find_element_by_id('id_text')
+
     def setUp(self):
         self.browser = webdriver.Chrome('C:\\webdrivers\\chromedriver.exe')
         staging_server = os.environ.get('STAGING_SERVER')

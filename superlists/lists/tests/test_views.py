@@ -4,6 +4,7 @@ from django.http import HttpRequest
 
 from lists.views import indexView
 from lists.models import Item, List
+from lists.forms import ItemForm
 # Create your tests here.
 
 class IndexPageTest(TestCase):
@@ -14,7 +15,7 @@ class IndexPageTest(TestCase):
 
     def test_use_right_form(self):
         response = self.client.get('/')
-        self.assertIsInstanse(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ItemForm)
 
 
 class ListViewTest(TestCase):
@@ -53,7 +54,7 @@ class ListViewTest(TestCase):
 
         self.client.post(
             f'/lists/{right_list.id}/',
-            {'item_text' : 'right test text 1'}
+            {'text' : 'right test text 1'}
         )
 
         self.assertEquals(Item.objects.count(), 1)
@@ -75,7 +76,10 @@ class ListViewTest(TestCase):
 
     def test_error_when_adding_empty_item_to_list(self):
         list_ = List.objects.create()
-        response = self.client.post(f'/lists/{list_.id}/', data = {'item_text' : ''})
+        response = self.client.post(
+            f'/lists/{list_.id}/',
+            data = {'text' : ''}
+        )
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'lists/list.html')
         self.assertContains(response, 'Can`t have an empty list item,')
@@ -84,14 +88,20 @@ class ListViewTest(TestCase):
 class NewListTest(TestCase):
     def test_post_can_save(self):
         test_item_text = 'New item'
-        response = self.client.post('/lists/new', data={'item_text' : test_item_text, 'list_id' : List.objects.create().id})
+        response = self.client.post(
+            '/lists/new',
+            data={'text' : test_item_text, 'list_id' : List.objects.create().id}
+        )
         first_item = Item.objects.first()
 
         self.assertEqual(Item.objects.count(), 1)
         self.assertEqual(first_item.text, test_item_text)
 
     def test_redirect_after_post(self):
-        response = self.client.post('/lists/new', data={'item_text' : 'test'})
+        response = self.client.post(
+            '/lists/new',
+            data={'text' : 'test'}
+        )
         list_id = List.objects.first().id
         self.assertRedirects(response, f'/lists/{list_id}/')
 
@@ -99,12 +109,18 @@ class NewListTest(TestCase):
 class NewItemTest(TestCase):
 
     def test_validation_errors_return_to_homepage(self):
-        response = self.client.post('/lists/new', data={'item_text' : ''})
+        response = self.client.post(
+            '/lists/new',
+            data={'text' : ''}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'lists/index.html')
         self.assertContains(response, 'Can`t have an empty list item,')
 
     def test_empty_items_are_not_saved(self):
-        response = self.client.post('/lists/new', data={'item_text' : ''})
+        response = self.client.post(
+            '/lists/new',
+            data={'text' : ''}
+        )
         self.assertEquals(Item.objects.count(), 0)
         self.assertEquals(List.objects.count(), 0)

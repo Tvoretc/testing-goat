@@ -18,7 +18,7 @@ class NewVisitorTest(FunctionalTest):
 
         for i in range(len(to_do_items)):
             #find inputbox
-            inputbox = self.browser.find_element_by_id('id_new_item')
+            inputbox = self.get_item_input_box()
             self.assertEqual(
                 inputbox.get_attribute('placeholder'),
                 'Enter a to-do item'
@@ -43,7 +43,7 @@ class NewVisitorTest(FunctionalTest):
         # table = self.browser.find_element_by_tag_name('table')
         # self.assertNotIn('1:', table.text)
 
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('my unique to-do item.')
         inputbox.send_keys(Keys.ENTER)
         table = self.browser.find_element_by_tag_name('table')
@@ -60,7 +60,7 @@ class NewVisitorTest(FunctionalTest):
         # table = self.browser.find_element_by_tag_name('table')
         # self.assertNotIn('1:', table.text)
 
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('other user`s item.')
         inputbox.send_keys(Keys.ENTER)
         table = self.browser.find_element_by_tag_name('table')

@@ -9,7 +9,7 @@ def indexView(request):
 
 def listView(request, list_id):
     if request.method == 'POST':
-        text = request.POST['item_text']
+        text = request.POST.get('text', '')
         if len(text) == 0:
             return render(request, 'lists/list.html', {
                 'list' : List.objects.get(id = list_id),
@@ -23,7 +23,7 @@ def listView(request, list_id):
     })
 
 def newListView(request):
-    text = request.POST['item_text']
+    text = request.POST.get('text', '')
     if len(text) == 0:
         return render(request, 'lists/index.html', {'error' : 'Can`t have an empty list item,'})
     list_ = List.objects.create()
