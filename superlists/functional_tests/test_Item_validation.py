@@ -2,43 +2,49 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from unittest import skip
 from functional_tests.base import FunctionalTest
+from lists.forms import EMPTY_ITEM_ERROR
+import time
 
 
 class ItemValidationTest(FunctionalTest):
+
+    def assertItemInList(self, item):
+        table = self.browser.find_element_by_tag_name('table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(
+            any(item in row.text for row in rows),
+            f"Item <{item}> did not appeare in a table: \n{table.text}"
+        )
+
     def test_cannot_add_empty_list_items(self):
         self.browser.get(self.live_server_url)
         # enter empty value
-        self.get_item_input_box().send_keys(Keys.ENTER)
+        input = self.get_item_input_box()
+        input.send_keys(Keys.ENTER)
         # get error
-        self.assertEqual(
-            self.browser.find_element_by_css_selector('.has-error').text,
-            'Can`t have an empty list item,'
-        )
+        self.browser.find_elements_by_css_selector('#id_text:invalid')
 
-        to_do_items = ('not empty', 'not empty 2')
-        # enter nonempty value
-        input = self.browser.find_element_by_id('id_text')
-        input.send_keys('not empty')
-        input.send_keys(Keys.Enter)
+        # input valid text
+        input.send_keys('buy milk')
+        # see it is valid
+        self.browser.find_elements_by_css_selector('#id_text:valid')
+        input.send_keys(Keys.ENTER)
 
-        # enter empty value again
-        self.browser.find_element_by_id('id_text').send_keys(Keys.ENTER)
+        # check if item appeared in list
+        self.assertItemInList('buy milk')
 
-        # get error
-        self.assertEqual(
-            self.client.find_element_by_css_selector('.has-error').text,
-            'Can`t have an empty list item,'
-        )
+        # empty imput again
+        input = self.get_item_input_box()
+        input.send_keys(Keys.ENTER)
+
+        self.browser.find_elements_by_css_selector('#id_text:invalid')
+        self.assertItemInList('buy milk')
 
         # enter enother nonempty value
-        input = self.browser.find_element_by_id('id_text')
-        input.send_keys('not empty 2')
-        input.send_keys(Keys.Enter)
+        input = self.get_item_input_box()
+        input.send_keys('make a tea')
+        input.send_keys(Keys.ENTER)
 
-        table = self.browser.find_element_by_tag_name('table')
-        rows = table.find_elements_by_tag_name('tr')
-        for item in to_do_items:
-            self.assertTrue(
-                any(item in row.text for row in rows),
-                f"Item <{item}> did not appeare in a table: \n{table.text}"
-            )
+        # check if item appeared in list
+        self.assertItemInList('buy milk')
+        self.assertItemInList('make a tea')
