@@ -125,7 +125,7 @@ class NewItemTest(TestCase):
 
     def test_invalid_input_returns_form(self):
         response = self.post_invalid_item()
-        print(response)
+        # print(response)
         self.assertIsInstance(response.context.get('form', None), ItemForm)
 
     def test_invalid_input_returns_error(self):

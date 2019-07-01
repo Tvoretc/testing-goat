@@ -8,31 +8,26 @@ def indexView(request):
     return render(request, 'lists/index.html', {'form': ItemForm()})
 
 def listView(request, list_id):
+    list_ = List.objects.get(id = list_id)
+    form = ItemForm(list_ = list_)
     if request.method == 'POST':
-        text = request.POST.get('text', '')
-        if len(text) == 0:
+        form = ItemForm(list_ = list_, data = request.POST)
+        if form.is_valid():
+            form.save(list_ = list_)
             return render(request, 'lists/list.html', {
-                'list' : List.objects.get(id = list_id),
-                'form' : ItemForm(data=request.POST)
+                'list' : list_,
+                'form' : form,
             })
-        list_ = List.objects.get(id = list_id)
-        Item.objects.create(text = text, list = list_)
 
     return render(request, 'lists/list.html', {
-        'list' : List.objects.get(id = list_id),
-        'form' : ItemForm(),
+        'list' : list_,
+        'form' : form,
     })
 
 def newListView(request):
-    text = request.POST.get('text', '')
-    if len(text) == 0:
-        return render(
-            request,
-            'lists/index.html',
-            {
-                'form' : ItemForm(data=request.POST)
-             }
-        )
-    list_ = List.objects.create()
-    Item.objects.create(text = text, list = List.objects.get(id = list_.id))
-    return redirect('list_view', list_.id)
+    form = ItemForm(data = request.POST)
+    if form.is_valid():
+        list_ = List.objects.create()
+        form.save(list_ = list_)
+        return redirect(list_)
+    return render(request, 'lists/index.html', {'form' : form})
