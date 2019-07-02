@@ -5,7 +5,7 @@ from django.utils.html import escape
 
 from lists.views import indexView
 from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm, DUPLICATE_ITEM_ERROR
 # Create your tests here.
 
 class IndexPageTest(TestCase):
@@ -79,7 +79,7 @@ class ListViewTest(TestCase):
     def test_displays_item_form(self):
         list_ = List.objects.create()
         response = self.client.get(f'/lists/{list_.id}/')
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
 
 
@@ -126,7 +126,7 @@ class NewItemTest(TestCase):
     def test_invalid_input_returns_form(self):
         response = self.post_invalid_item()
         # print(response)
-        self.assertIsInstance(response.context.get('form', None), ItemForm)
+        self.assertIsInstance(response.context.get('form', None), ExistingListItemForm)
 
     def test_invalid_input_returns_error(self):
         response = self.post_invalid_item()
@@ -153,3 +153,12 @@ class NewItemTest(TestCase):
         )
         self.assertEquals(Item.objects.count(), 0)
         self.assertEquals(List.objects.count(), 0)
+
+    def test_duplicates_validate_error_and_endupon_listpage(self):
+        list_ = List.objects.create()
+        item = Item.objects.create(list = list_, text = '123456')
+        response = self.client.post(f'/lists/{list_.id}/', data={'text':'123456'})
+
+        self.assertContains(response, DUPLICATE_ITEM_ERROR)
+        self.assertTemplateUsed('lists/list.html')
+        self.assertEquals(Item.objects.count(), 1)

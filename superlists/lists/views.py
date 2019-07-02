@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm
 # Create your views here.
 
 def indexView(request):
@@ -9,15 +9,11 @@ def indexView(request):
 
 def listView(request, list_id):
     list_ = List.objects.get(id = list_id)
-    form = ItemForm(list_ = list_)
+    form = ExistingListItemForm(list_ = list_)
     if request.method == 'POST':
-        form = ItemForm(list_ = list_, data = request.POST)
+        form = ExistingListItemForm(list_ = list_, data = request.POST)
         if form.is_valid():
-            form.save(list_ = list_)
-            return render(request, 'lists/list.html', {
-                'list' : list_,
-                'form' : form,
-            })
+            form.save()
 
     return render(request, 'lists/list.html', {
         'list' : list_,
