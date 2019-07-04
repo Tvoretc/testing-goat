@@ -67,3 +67,20 @@ class ItemValidationTest(FunctionalTest):
             'You`ve already entered this item. Can`t have duplicates.'
         )
         self.assertEquals(Item.objects.count(), 1)
+
+    def test_duplicate_error_disappeares_after_change(self):
+        self.browser.get(self.live_server_url)
+        input = self.get_item_input_box()
+        input.send_keys('item')
+        input.send_keys(Keys.ENTER)
+        table = self.browser.find_element_by_tag_name('table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(any('item' in row.text for row in rows))
+
+        input = self.get_item_input_box()
+        input.send_keys('item')
+        input.send_keys(Keys.ENTER)
+        self.assertTrue(self.browser.find_element_by_css_selector('.has-error').is_displayed())
+        input = self.get_item_input_box()
+        input.send_keys('1')
+        self.assertFalse(self.browser.find_element_by_css_selector('.has-error').is_displayed())
