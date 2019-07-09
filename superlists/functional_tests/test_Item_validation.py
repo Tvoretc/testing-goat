@@ -68,7 +68,7 @@ class ItemValidationTest(FunctionalTest):
         )
         self.assertEquals(Item.objects.count(), 1)
 
-    def test_duplicate_error_disappeares_after_change(self):
+    def test_duplicate_error_disappeares_after_change_or_click(self):
         self.browser.get(self.live_server_url)
         input = self.get_item_input_box()
         input.send_keys('item')

@@ -4,9 +4,14 @@
 //   assert.equal($('.has-error').is('visible'), false, 'hidden');
 // });
 
-var initialize = function () {
+window.Superlists = {};
+window.Superlists.initialize = function () {
   $('input[name="text"]').on('keypress', function(){
-    $('.has-error').hide();});
+    $('.has-error').hide();
+  });
+  $('input[name="text"]').on('click', function(){
+    $('.has-error').hide();
+  });
 };
 
 QUnit.test('errors are not hidden if there is no keypress', function(assert){
@@ -15,5 +20,10 @@ QUnit.test('errors are not hidden if there is no keypress', function(assert){
 
 QUnit.test('errors should be hidden on keypress', function (assert){
   $('input[name="text"]').trigger('keypress');
+  assert.equal($('.has-error').is(':visible'), false);
+});
+
+QUnit.test('errors should be hidden on click', function (assert){
+  $('input[name="text"]').trigger('click');
   assert.equal($('.has-error').is(':visible'), false);
 });
