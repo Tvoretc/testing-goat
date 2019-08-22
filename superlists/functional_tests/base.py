@@ -21,12 +21,30 @@ class FunctionalTest(StaticLiveServerTestCase):
     def get_item_input_box(self):
         return self.browser.find_element_by_id('id_text')
 
+    def wait(fn):
+        def modified_fn(*args, **kwargs):
+            start_time = time.time()
+            while True:
+                try:
+                    return fn(*args, **kwargs)
+                except (AssertionError, WebDriverException) as e:
+                    if time.time() - start_time > 5:
+                        raise e
+                    time.sleep(0.5)
+        return modified_fn
+
+    @wait
     def assert_logged_in(self, email):
         self.browser.find_element_by_link_text('Log out')
         navbar = self.browser.find_element_by_css_selector('.navbar')
         self.assertIn(email, navbar.text)
 
+    @wait
     def assert_logged_out(self, email):
         self.browser.find_element_by_name('email')
         navbar = self.browser.find_element_by_css_selector('.navbar')
         self.assertNotIn(email, navbar.text)
+
+    @wait
+    def wait_for(fn):
+        return fn()
