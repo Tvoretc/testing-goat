@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 django=2.2.1
+gunicorn==19.9.0
+=======
+django~>2.2.4
+>>>>>>> 8bcc7faf4ff47739bccfd97f720d5228a7e2d038
 gunicorn==19.9.0
