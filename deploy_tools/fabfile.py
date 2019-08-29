@@ -1,11 +1,11 @@
 from fabric.contrib.files import append, exists, sed
-from fabric.apt import env, local, run
+from fabric.api import env, local, run
 import random
 
 REPO_URL = 'https://github.com/Tvoretc/testing-goat.git'
 
 def deploy():
-    site_forder = f'/home/{env.user}/sites/{env.host}'
+    site_folder = f'/home/{env.user}/sites/{env.host}'
     source_folder = site_folder + '/source'
     _create_directory_structure_if_necessary(site_folder)
     _get_latest_source(source_folder)
@@ -27,7 +27,7 @@ def _get_latest_source(source_folder):
     run(f'cd {source_folder} && git reset --hard {current_commit}')
 
 def _update_settings(source_folder, site_name):
-    settings_path = source_folder + 'superlists/settings.py'
+    settings_path = source_folder + '/superlists/settings.py'
     sed(settings_path, "DEBUG = True", "DEBUG = False")
     sed(settings_path, 'ALLOWED_HOSTS = .+$', f'ALLOWED_HOSTS = ["{site_name}"]')
     secret_key_file = source_folder + '/superlists/secret_key.py'
