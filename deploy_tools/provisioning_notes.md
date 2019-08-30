@@ -33,3 +33,12 @@ Assume we have a user account at /home/username
         ├── source
         ├── static
         └── virtualenv
+
+## SSH keys reset
+https://stackoverflow.com/questions/10101127/fabric-asks-for-password-even-though-i-can-ssh-using-credential
+
+For me, I had to reset SSH agent identities with:
+ssh-add -D
+Then add my key back with:
+ssh-add -K keyname
+Careful, this will delete all identities from SSH agent.
