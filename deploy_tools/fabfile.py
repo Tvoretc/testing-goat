@@ -15,8 +15,9 @@ def deploy():
     _update_database(source_folder)
 
 def _create_directory_structure_if_necessary(site_folder):
-    for subfolder in ('database', 'static', 'virtualenv', 'source'):
-        run(f'mkdir -p {site_folder}/{subfolder}')
+    if not exists(site_folder+'source'):
+        for subfolder in ('database', 'static', 'virtualenv', 'source'):
+            run(f'mkdir -p {site_folder}/{subfolder}')
 
 def _get_latest_source(source_folder):
     if exists(source_folder+'/.git'):
