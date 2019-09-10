@@ -25,14 +25,16 @@ class ItemValidationTest(FunctionalTest):
         # get error
         self.browser.find_elements_by_css_selector('#id_text:invalid')
 
-        # input valid text
-        input.send_keys('buy milk')
-        # see it is valid
-        self.browser.find_elements_by_css_selector('#id_text:valid')
-        input.send_keys(Keys.ENTER)
 
-        # check if item appeared in list
-        self.assertItemInList('buy milk')
+        self.add_list_item('buy milk')
+        # # input valid text
+        # input.send_keys('buy milk')
+        # # see it is valid
+        # self.browser.find_elements_by_css_selector('#id_text:valid')
+        # input.send_keys(Keys.ENTER)
+        #
+        # # check if item appeared in list
+        # self.assertItemInList('buy milk')
 
         # empty input again
         input = self.get_item_input_box()

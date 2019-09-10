@@ -2,6 +2,8 @@ from django.urls import resolve
 from django.test import TestCase
 from django.http import HttpRequest
 from django.utils.html import escape
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from lists.views import indexView
 from lists.models import Item, List
@@ -104,6 +106,13 @@ class NewListTest(TestCase):
         list_id = List.objects.first().id
         self.assertRedirects(response, f'/lists/{list_id}/')
 
+    def test_list_owner_saved_when_authenticated(self):
+        user = User.objects.create(email='a@gmail.com')
+        self.client.force_login(user)
+        self.client.post('/lists/new', data={'text':'new item'})
+        list_ = List.objects.first()
+        self.assertEqual(list_.owner, user)
+
 
 class NewItemTest(TestCase):
 
@@ -162,3 +171,18 @@ class NewItemTest(TestCase):
         self.assertContains(response, DUPLICATE_ITEM_ERROR)
         self.assertTemplateUsed('lists/list.html')
         self.assertEquals(Item.objects.count(), 1)
+
+
+# all lists of one user
+class MyListsViewTest(TestCase):
+
+    def test_renders_right_template(self):
+        User.objects.create(email='a@gmail.com')
+        response = self.client.get('/lists/users/a@gmail.com')
+        self.assertTemplateUsed(response, 'lists/my_lists.html')
+
+    def test_passes_correct_owner(self):
+        User.objects.create(email='wrong@gmail.com')
+        correct_user = User.objects.create(email='right@gmail.com')
+        response = self.client.get('/lists/users/right@gmail.com')
+        self.assertEqual(response.context['owner'], correct_user)

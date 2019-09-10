@@ -5,8 +5,12 @@ Description=Gunicorn server for SITENAME
 Restart=on-failure
 User=tvoretc
 WorkingDirectory=/home/tvoretc/sites/SITENAME/source
+Enviroment=EMAIL_PASSWORD=REKRIT
 ExecStart=/home/tvoretc/sites/SITENAME/virtualenv/bin/gunicorn \
-  --bind unix:/tmp/SITENAME.socket superlists.wsgi:application
+  --bind unix:/tmp/SITENAME.socket \
+  --access-logfile ../access.log \
+  --error-logfile ../error.log \
+  superlists.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
