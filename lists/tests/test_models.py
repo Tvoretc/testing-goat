@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 
 from lists.models import Item, List
 # Create your tests here.
+User = get_user_model()
 
 class ItemModelTest(TestCase):
     def test_item_default_text(self):
@@ -14,7 +16,7 @@ class ItemModelTest(TestCase):
         item = Item()
         item.list = list_
         item.save()
-        self.assertIn(item, list_item_set.all())
+        self.assertIn(item, list_.item_set.all())
     #
     # def test_saving_and_retriving(self):
     #     list_ = List()
@@ -66,8 +68,37 @@ class ItemModelTest(TestCase):
         self.assertEquals(Item.objects.all(), [item1, item2, item3])
 
 
-class ItemModelTest(TestCase):
-    def test_list_has_url(self):
+class ListModelTest(TestCase):
+
+    def test_get_absolute_url(self):
         list_ = List.objects.create()
         self.assertEqual(list_.get_absolute_url(), f"/lists/{list_.id}/")
-    
+
+    def test_create_new_makes_list_and_item(self):
+        List.create_new(first_item_text='new item text')
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'new item text')
+        new_list = List.objects.first()
+        self.assertEqual(new_list, new_item.list)
+
+    def test_create_new_optionally_saves_owner(self):
+        user = User.objects.create()
+        List.create_new(first_item_text='new item text', owner=user)
+        new_list = List.objects.first()
+        self.assertEqual(new_list.owner, user)
+
+    def test_list_can_have_owner(self):
+        List(owner=User())
+
+    def test_list_owner_is_optional(self):
+        List().full_clean()
+
+    def test_create_new_returns_new_list(self):
+        returned = List.create_new(first_item_text = 'new item text')
+        self.assertEqual(List.objects.first(), returned)
+
+    def test_list_name_is_first_item_text(self):
+        list_ = List.objects.create()
+        Item.objects.create(list=list_, text='first item')
+        Item.objects.create(list=list_, text='second item')
+        self.assertEqual(list_.name, 'first item')
