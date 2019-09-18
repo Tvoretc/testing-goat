@@ -9,7 +9,7 @@ User = get_user_model()
 from unittest.mock import patch
 import unittest
 
-from lists.views import indexView
+from lists.views import indexView, newListView
 from lists.models import Item, List
 from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm, DUPLICATE_ITEM_ERROR
 # Create your tests here.
