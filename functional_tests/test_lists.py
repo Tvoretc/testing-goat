@@ -53,7 +53,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertRegex(first_url, '/lists/.+')
 
         self.browser.quit()
-        self.browser = webdriver.Chrome('C:\\webdrivers\\chromedriver.exe')
+        self.browser = webdriver.Chrome(self.chrome_dir)
 
         self.browser.get(self.live_server_url)
 

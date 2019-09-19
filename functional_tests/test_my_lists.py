@@ -61,4 +61,4 @@ class MyListsTest(FunctionalTest):
 
         # logs out, "My lists" disappear
         self.browser.find_element_by_link_text('Log out').click()
-        self.assertEquals(self.browser.find_element_by_link_text('My lists'), [])
+        self.assertEquals(self.browser.find_elements_by_link_text('My lists'), [])
