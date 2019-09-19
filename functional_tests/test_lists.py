@@ -70,5 +70,5 @@ class NewVisitorTest(FunctionalTest):
         second_url = self.browser.current_url
         self.assertRegex(second_url, '/lists/.+')
         self.assertNotEqual(first_url, second_url)
-
+        
         self.assertNotIn('my unique to-do item.', table.text)

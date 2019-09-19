@@ -5,6 +5,11 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 import os
 import time
+from datetime import datetime
+
+SCREEN_DUMP_LOCATION = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), 'screendumps'
+)
 
 class FunctionalTest(StaticLiveServerTestCase):
     # def send_input(self, input, text):
@@ -20,9 +25,6 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
             self.live_server_url = 'http://' + staging_server
-
-    def tearDown(self):
-        self.browser.quit()
 
     def get_item_input_box(self):
         return self.browser.find_element_by_id('id_text')
@@ -66,3 +68,44 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.get_item_input_box().send_keys(Keys.ENTER)
         item_number = len(self.browser.find_elements_by_css_selector('#id_list_table tr')) - 1
         self.wait_for_row_in_list_table(f'{item_number} {item_text}')
+
+###
+### tearDown part
+###
+
+    def _test_has_failed(self):
+        # wut
+        return any(error for (method, error) in self._outcome.errors)
+
+    def take_screenshot(self):
+        filename = self._get_filename()+'.png'
+        print('screenshotting to ', filename)
+        self.browser.get_screenshot_as_file(filename)
+
+    def dump_html(self):
+        filename = self._get_filename()+'.html'
+        print('dumping html page to ', filename)
+        with open(filename, 'w') as f:
+            f.write(self.browser.page_source)
+
+    def _get_filename(self):
+        timestamp = datetime.now().isoformat().replace(':', '.')[:19]
+        return '{folder}/{classname}.{method}-window{windowid}-{timestamp}'.format(
+            folder = SCREEN_DUMP_LOCATION,
+            classname = self.__class__.__name__,
+            method = self._testMethodName,
+            windowid = self._windowid,
+            timestamp = timestamp
+        )
+
+    def tearDown(self):
+        if self._test_has_failed():
+            if not os.path.exists(SCREEN_DUMP_LOCATION):
+                os.makedirs(SCREEN_DUMP_LOCATION)
+            for ix, handle in enumerate(self.browser.window_handles):
+                self._windowid = ix
+                self.browser.switch_to_window(handle)
+                self.take_screenshot()
+                self.dump_html()
+        self.browser.quit()
+        super().tearDown()
