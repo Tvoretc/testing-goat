@@ -12,7 +12,11 @@ class FunctionalTest(StaticLiveServerTestCase):
     #     input.send_keys(Keys.ENTER)
 
     def setUp(self):
-        self.browser = webdriver.Chrome('../webdrivers/chromedriver.exe')
+        if os.name == 'nt':
+            chrome_dir = '../webdrivers/chromedriver.exe'
+        else:
+            chrome_dir = '/usr/bin/chromedriver'
+        self.browser = webdriver.Chrome(chrome_dir)
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
             self.live_server_url = 'http://' + staging_server
