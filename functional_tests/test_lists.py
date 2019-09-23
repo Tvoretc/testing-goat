@@ -29,13 +29,7 @@ class NewVisitorTest(FunctionalTest):
             inputbox.send_keys(Keys.ENTER)
 
             #check the table for items
-            table = self.browser.find_element_by_tag_name('table')
-            rows = table.find_elements_by_tag_name('tr')
-            for item in to_do_items[:i+1]:
-                self.assertTrue(
-                    any(item in row.text for row in rows),
-                    f"Item <{item}> did not appeare in a table: \n{table.text}"
-                )
+            self.assert_items_in_list(to_do_items[:i+1])
 
     def test_different_visitors_have_different_lists(self):
         self.browser.get(self.live_server_url)
@@ -70,5 +64,5 @@ class NewVisitorTest(FunctionalTest):
         second_url = self.browser.current_url
         self.assertRegex(second_url, '/lists/.+')
         self.assertNotEqual(first_url, second_url)
-        
+
         self.assertNotIn('my unique to-do item.', table.text)

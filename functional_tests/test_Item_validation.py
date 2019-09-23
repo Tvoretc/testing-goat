@@ -9,14 +9,6 @@ import time
 
 class ItemValidationTest(FunctionalTest):
 
-    def assertItemInList(self, item):
-        table = self.browser.find_element_by_tag_name('table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(item in row.text for row in rows),
-            f"Item <{item}> did not appeare in a table: \n{table.text}"
-        )
-
     def test_cannot_add_empty_list_items(self):
         self.browser.get(self.live_server_url)
         # enter empty value
@@ -34,7 +26,7 @@ class ItemValidationTest(FunctionalTest):
         # input.send_keys(Keys.ENTER)
         #
         # # check if item appeared in list
-        # self.assertItemInList('buy milk')
+        # self.assert_item_in_list('buy milk')
 
         # empty input again
         input = self.get_item_input_box()
@@ -43,7 +35,7 @@ class ItemValidationTest(FunctionalTest):
         input.send_keys(Keys.ENTER)
 
         self.browser.find_elements_by_css_selector('#id_text:invalid')
-        self.assertItemInList('buy milk')
+        self.assert_item_in_list('buy milk')
 
         # enter enother nonempty value
         input = self.get_item_input_box()
@@ -51,8 +43,8 @@ class ItemValidationTest(FunctionalTest):
         input.send_keys(Keys.ENTER)
 
         # check if item appeared in list
-        self.assertItemInList('buy milk')
-        self.assertItemInList('make a tea')
+        self.assert_item_in_list('buy milk')
+        self.assert_item_in_list('make a tea')
 
     def test_cant_have_duplicates(self):
         self.browser.get(self.live_server_url)
@@ -75,8 +67,7 @@ class ItemValidationTest(FunctionalTest):
         input = self.get_item_input_box()
         input.send_keys('item')
         input.send_keys(Keys.ENTER)
-        table = self.browser.find_element_by_tag_name('table')
-        rows = table.find_elements_by_tag_name('tr')
+        rows = self.get_table_rows()
         self.assertTrue(any('item' in row.text for row in rows))
 
         input = self.get_item_input_box()

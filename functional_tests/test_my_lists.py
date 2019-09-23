@@ -3,25 +3,13 @@ from django.contrib.auth import BACKEND_SESSION_KEY, SESSION_KEY, get_user_model
 from django.contrib.sessions.backends.db import SessionStore
 
 from functional_tests.base import FunctionalTest
+from functional_tests.my_lists_page import MyListsPage
 
 import time
 
 User = get_user_model()
 
 class MyListsTest(FunctionalTest):
-    def create_pre_authenticated_session(self, email):
-        user = User.objects.create(email=email)
-        session = SessionStore()
-        session[SESSION_KEY] = user.pk
-        session[BACKEND_SESSION_KEY] = settings.AUTHENTICATION_BACKENDS[0]
-        session.save()
-
-        self.browser.get(self.live_server_url + '/non-existing-url/')
-        self.browser.add_cookie(dict(
-            name = settings.SESSION_COOKIE_NAME,
-            value= session.session_key,
-            path = '/',
-        ))
 
     def test_logged_in_users_list_saved_as_his(self):
         email = 'a@gmail.com'
@@ -43,7 +31,8 @@ class MyListsTest(FunctionalTest):
         first_list_url = self.browser.current_url
 
         # goes to "My lists"
-        self.browser.find_element_by_link_text('My lists').click()
+        my_lists_page = MyListsPage(self)
+        my_lists_page.get_my_list_link().click()
 
         # sees new list
         self.browser.find_element_by_link_text('Nice list').click()

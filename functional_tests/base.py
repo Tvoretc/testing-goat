@@ -1,20 +1,23 @@
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
+
+from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.auth import BACKEND_SESSION_KEY, SESSION_KEY, get_user_model
 
 import os
 import time
 from datetime import datetime
+
+User = get_user_model()
 
 SCREEN_DUMP_LOCATION = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), 'screendumps'
 )
 
 class FunctionalTest(StaticLiveServerTestCase):
-    # def send_input(self, input, text):
-    #     input.send_keys(text)
-    #     input.send_keys(Keys.ENTER)
 
     def setUp(self):
         if os.name == 'nt':
@@ -25,6 +28,9 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
             self.live_server_url = 'http://' + staging_server
+
+    def get_table_rows(self):
+        return self.browser.find_elements_by_css_selector('#id_list_table tr')
 
     def get_item_input_box(self):
         return self.browser.find_element_by_id('id_text')
@@ -41,6 +47,21 @@ class FunctionalTest(StaticLiveServerTestCase):
                     time.sleep(0.5)
         return modified_fn
 
+    def assert_item_in_list(self, item):
+        rows = self.get_table_rows()
+        self.assertTrue(
+            any(item in row.text for row in rows),
+            f"Item <{item}> did not appeare in a table"
+        )
+
+    def assert_items_in_list(self, items):
+        rows = self.get_table_rows()
+        for item in items:
+            self.assertTrue(
+                any(item in row.text for row in rows),
+                f"Item <{item}> did not appeare in a table"
+            )
+
     @wait
     def assert_logged_in(self, email):
         self.browser.find_element_by_link_text('Log out')
@@ -55,8 +76,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     @wait
     def wait_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
+        rows = self.get_table_rows()
         self.assertIn(row_text, [row.text for row in rows])
 
     @wait
@@ -68,6 +88,20 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.get_item_input_box().send_keys(Keys.ENTER)
         item_number = len(self.browser.find_elements_by_css_selector('#id_list_table tr')) - 1
         self.wait_for_row_in_list_table(f'{item_number} {item_text}')
+
+    def create_pre_authenticated_session(self, email):
+        user = User.objects.create(email=email)
+        session = SessionStore()
+        session[SESSION_KEY] = user.pk
+        session[BACKEND_SESSION_KEY] = settings.AUTHENTICATION_BACKENDS[0]
+        session.save()
+
+        self.browser.get(self.live_server_url + '/non-existing-url/')
+        self.browser.add_cookie(dict(
+            name = settings.SESSION_COOKIE_NAME,
+            value= session.session_key,
+            path = '/',
+        ))
 
 ###
 ### tearDown part
