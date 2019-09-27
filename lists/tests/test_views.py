@@ -1,9 +1,10 @@
 from django.urls import resolve
 from django.test import TestCase
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.utils.html import escape
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
+from django.shortcuts import redirect
+
 User = get_user_model()
 
 from unittest.mock import patch
@@ -29,7 +30,7 @@ class ListViewTest(TestCase):
 
     def test_uses_list_template(self):
         list_ = List.objects.create()
-        response = self.client.get(f'/lists/{list_.id}/')
+        response = self.client.get(f'/lists/{list_.id}')
         self.assertTemplateUsed(response, 'lists/list.html')
 
     def test_view_displays_appropriate_list_items(self):
@@ -41,7 +42,7 @@ class ListViewTest(TestCase):
         Item.objects.create(text = 'enother item 1', list = second_list_)
         Item.objects.create(text = 'enother item 2', list = second_list_)
 
-        response = self.client.get(f'/lists/{first_list_.id}/')
+        response = self.client.get(f'/lists/{first_list_.id}')
 
         self.assertContains(response, 'item 1')
         self.assertContains(response, 'item 2')
@@ -52,7 +53,7 @@ class ListViewTest(TestCase):
         right_list = List.objects.create()
         wrong_list = List.objects.create()
 
-        response = self.client.get(f'/lists/{right_list.id}/')
+        response = self.client.get(f'/lists/{right_list.id}')
         self.assertEqual(response.context['list'], right_list)
 
     def test_can_save_to_existing_list(self):
@@ -61,7 +62,7 @@ class ListViewTest(TestCase):
         wrong_list2 = List.objects.create()
 
         self.client.post(
-            f'/lists/{right_list.id}/',
+            f'/lists/{right_list.id}',
             {'text' : 'right test text 1'}
         )
 
@@ -76,7 +77,7 @@ class ListViewTest(TestCase):
         wrong_list2 = List.objects.create()
 
         response = self.client.post(
-            f'/lists/{right_list.id}/',
+            f'/lists/{right_list.id}',
             {'item_text' : 'right test text'}
         )
 
@@ -84,10 +85,26 @@ class ListViewTest(TestCase):
 
     def test_displays_item_form(self):
         list_ = List.objects.create()
-        response = self.client.get(f'/lists/{list_.id}/')
+        response = self.client.get(f'/lists/{list_.id}')
         self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
 
+    def test_displays_shared_users(self):
+        user = User.objects.create(email='b@gmail.com')
+        list_ = List.objects.create()
+        list_.shared_with.add(user)
+        response = self.client.get(f'/lists/{list_.id}')
+        self.assertContains(response, user)
+
+    def test_displays_owner(self):
+        user = User.objects.create(email='b@gmail.com')
+        list_ = List.objects.create()
+        list_.owner = user
+        list_.save()
+        response = self.client.get(f'/lists/{list_.id}')
+        self.assertContains(response, f'Owner: {user}')
+
+#ListViewTest end
 
 class NewListViewIntegratedTest(TestCase):
 
@@ -108,7 +125,7 @@ class NewListViewIntegratedTest(TestCase):
             data={'text' : 'test'}
         )
         list_id = List.objects.first().id
-        self.assertRedirects(response, f'/lists/{list_id}/')
+        self.assertRedirects(response, f'/lists/{list_id}')
 
     def test_list_owner_saved_if_authenticated(self): #, mockListClass, mockItemFormClass, mock_redirect):
         user = User.objects.create(email='a@gmail.com')
@@ -182,7 +199,7 @@ class NewItemTest(TestCase):
     def post_invalid_item(self):
         list_ = List.objects.create()
         return self.client.post(
-            f'/lists/{list_.id}/',
+            f'/lists/{list_.id}',
             data={'text' : ''},
         )
 
@@ -229,7 +246,7 @@ class NewItemTest(TestCase):
     def test_duplicates_validate_error_and_endupon_listpage(self):
         list_ = List.objects.create()
         item = Item.objects.create(list = list_, text = '123456')
-        response = self.client.post(f'/lists/{list_.id}/', data={'text':'123456'})
+        response = self.client.post(f'/lists/{list_.id}', data={'text':'123456'})
 
         self.assertContains(response, DUPLICATE_ITEM_ERROR)
         self.assertTemplateUsed('lists/list.html')
@@ -249,3 +266,35 @@ class MyListsViewTest(TestCase):
         correct_user = User.objects.create(email='right@gmail.com')
         response = self.client.get('/lists/users/right@gmail.com')
         self.assertEqual(response.context['owner'], correct_user)
+
+    def test_displays_shared_lists(self):
+        user = User.objects.create(email = 'a@gmail.com')
+        list_ = List.objects.create()
+        list_.shared_with.add(user)
+        response = self.client.get('/lists/users/a@gmail.com')
+        self.assertContains(response, list_)
+
+#MyListsViewTest end
+
+class ListShareViewTest(TestCase):
+
+    def test_post_redirects_to_list_page(self):
+        # print('\n=====\ntest started\n=====\n')
+        user = User.objects.create(email='a@gmail.com')
+        list_ = List.objects.create()
+        response = self.client.post(
+            f"/lists/{list_.id}/share",
+            data={'share_email':user.email}
+        )
+        # print(f'\n==\ngot {response}\n==\n')
+        self.assertRedirects(response, f'/lists/{list_.id}')
+        # print('\n=====\ntest ended\n=====\n')
+
+    def test_user_added_to_shared(self):
+        user = User.objects.create(email='a@gmail.com')
+        list_ = List.objects.create()
+        response = self.client.post(
+            f"/lists/{list_.id}/share",
+            data={'share_email' : user.email}
+        )
+        self.assertIn(user, list_.shared_with.all())

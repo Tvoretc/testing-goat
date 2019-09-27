@@ -80,7 +80,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.assertIn(row_text, [row.text for row in rows])
 
     @wait
-    def wait_for(fn):
+    def wait_for(self, fn):
         return fn()
 
     def add_list_item(self, item_text):

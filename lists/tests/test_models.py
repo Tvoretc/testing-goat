@@ -72,7 +72,7 @@ class ListModelTest(TestCase):
 
     def test_get_absolute_url(self):
         list_ = List.objects.create()
-        self.assertEqual(list_.get_absolute_url(), f"/lists/{list_.id}/")
+        self.assertEqual(list_.get_absolute_url(), f"/lists/{list_.id}")
 
     def test_create_new_makes_list_and_item(self):
         List.create_new(first_item_text='new item text')
@@ -102,3 +102,10 @@ class ListModelTest(TestCase):
         Item.objects.create(list=list_, text='first item')
         Item.objects.create(list=list_, text='second item')
         self.assertEqual(list_.name, 'first item')
+
+    #shared_with
+    def test_shared_with_adds(self):
+        list_ = List.objects.create()
+        user = User.objects.create(email = 'b@gmail.com')
+        list_.shared_with.add(user)
+        self.assertIn(user, list_.shared_with.all())

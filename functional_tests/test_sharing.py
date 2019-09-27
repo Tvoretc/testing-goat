@@ -3,6 +3,7 @@ from functional_tests.base import FunctionalTest
 from functional_tests.list_page import ListPage
 from functional_tests.my_lists_page import MyListsPage
 
+import time
 
 def quit_if_possible(browser):
     try: browser.quit()
@@ -15,6 +16,7 @@ class SharingTest(FunctionalTest):
         # user A logs in
         self.create_pre_authenticated_session('a@gmail.com')
         a_browser = self.browser
+
         self.addCleanup(lambda: quit_if_possible(a_browser))
 
         # user B also logs in
@@ -35,20 +37,21 @@ class SharingTest(FunctionalTest):
 
         # B goes to my lists page
         self.browser = b_browser
-        my_list_page = MyListPage(self)
+        my_list_page = MyListsPage(self)
         my_list_page.go_to_my_lists_page()
-        self.browser.find_element_by_link_text('Shared list').click()
+
+        self.browser.find_element_by_partial_link_text('Shared list').click()
 
         # B can see list`s owner
-        self.wait_for(lambda: self.assertEqual(
-            list_page.get_list_owner(),
-            'a@gmail.com'
-        ))
+        self.assertIn(
+            'a@gmail.com',
+            list_page.get_list_owner()
+        )
 
         # B adds an item to the list
-        list_page.add_list_item('Item from B')
+        self.add_list_item('Item from B')
 
         # A sees new item
         self.browser = a_browser
         self.browser.refresh()
-        list_page.wait_for_row_in_list_table('Item from B', 2)
+        self.wait_for_row_in_list_table('2 Item from B')

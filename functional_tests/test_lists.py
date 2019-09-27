@@ -31,6 +31,7 @@ class NewVisitorTest(FunctionalTest):
             #check the table for items
             self.assert_items_in_list(to_do_items[:i+1])
 
+
     def test_different_visitors_have_different_lists(self):
         self.browser.get(self.live_server_url)
 

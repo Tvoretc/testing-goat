@@ -7,10 +7,20 @@ from django.conf import settings
 class List(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
         blank=True, null=True, on_delete=models.DO_NOTHING)
+    shared_with = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name = 'shared_lists'
+    )
+
+    def __str__(self):
+        return f'#{self.id} {self.name}'
 
     @property
     def name(self):
-        return self.item_set.first().text
+        if len(self.item_set.all()):
+            return self.item_set.first().text
+        else:
+            'Empty list'
 
     def get_absolute_url(self):
         return reverse('list_view', args=[self.id])

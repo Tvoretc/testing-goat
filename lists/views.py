@@ -35,3 +35,11 @@ def myListsView(request, email):
     owner = User.objects.get(email = email)
 
     return render(request, 'lists/my_lists.html', {'owner':owner})
+
+def listShareView(request, list_id):
+    list_ = List.objects.get(id = list_id)
+    if request.method == 'POST':
+        user = User.objects.get(email = request.POST['share_email'])
+        list_.shared_with.add(user)
+
+    return redirect(list_)
