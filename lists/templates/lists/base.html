@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
@@ -11,7 +13,7 @@
 
       <nav class="navbar navbar-default">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/">Superlists</a>
+          <a class="navbar-brand" href="/">{% trans "Welcome to" %} Superlists</a>
           {% if user.email %}
             <ul>
               <li> <a href="{% url 'my_lists' user.email %}">My lists</a> </li>
